@@ -1,0 +1,17 @@
+[project]
+name = "pkgs-template"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Alejandro Ouslan", email = "alejandro.ouslan@upr.edu" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+pkgs-template = "pkgs_template:main"
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12.0"]
+build-backend = "uv_build"
