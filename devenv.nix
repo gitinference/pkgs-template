@@ -1,10 +1,16 @@
-{ pkgs, lib, config, inputs, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  inputs,
+  ...
+}:
 {
   # https://devenv.sh/basics/
   env = {
     GREET = "devenv";
     OCO_AI_PROVIDER = "ollama";
-    OCO_PROMPT_MODULE = "conventional-commit"; 
+    OCO_PROMPT_MODULE = "conventional-commit";
     OCO_MODEL = "qwen2.5-coder:3b";
   };
 
@@ -25,7 +31,7 @@
     package = pkgs.python312;
     lsp.enable = true;
     venv.enable = true;
-    
+
     uv = {
       enable = true;
       sync.enable = true;
@@ -53,6 +59,10 @@
   # https://devenv.sh/git-hooks/
   git-hooks.hooks = {
     # 1. The Jupyter Notebook Clear Output Hook
+    nixfmt.enable = true;
+
+    prettier.enable = true;
+
     jupyter-nb-clear-output = {
       enable = true;
       name = "jupyter-nb-clear-output";
