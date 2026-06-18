@@ -1,5 +1,4 @@
 { pkgs, lib, config, inputs, ... }:
-
 {
   # https://devenv.sh/basics/
   env = {
@@ -33,12 +32,6 @@
     };
   };
 
-  # https://devenv.sh/processes/
-  # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
-
-  # https://devenv.sh/services/
-  # services.postgres.enable = true;
-
   # https://devenv.sh/scripts/
   scripts.hello.exec = ''
     echo hello from $GREET
@@ -51,12 +44,6 @@
     export OCO_API_CUSTOM_HEADERS="{\"Authorization\": \"Bearer $OLLAMA_API_KEY\"}"
   '';
 
-  # https://devenv.sh/tasks/
-  # tasks = {
-  #   "myproj:setup".exec = "mytool build";
-  #   "devenv:enterShell".after = [ "myproj:setup" ];
-  # };
-
   # https://devenv.sh/tests/
   enterTest = ''
     echo "Running tests"
@@ -64,18 +51,25 @@
   '';
 
   # https://devenv.sh/git-hooks/
-  # git-hooks.hooks.shellcheck.enable = true;
-# https://devenv.sh/git-hooks/
   git-hooks.hooks = {
-  # 1. The Jupyter Notebook Clear Output Hook (Local/Custom)
-  jupyter-nb-clear-output = {
-    enable = true;
-    name = "jupyter-nb-clear-output";
-    entry = "jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace";
-    files = "\\.ipynb$";
-    stages = [ "pre-commit" ];
-  };
+    # 1. The Jupyter Notebook Clear Output Hook
+    jupyter-nb-clear-output = {
+      enable = true;
+      name = "jupyter-nb-clear-output";
+      entry = "jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace";
+      files = "\\.ipynb$";
+      stages = [ "pre-commit" ];
+    };
 
+    # 2. Automatically update uv.lock and requirements.txt
+    uv-lock-and-requirements = {
+      enable = true;
+      name = "uv-lock-and-requirements";
+      entry = "sh -c 'uv lock && uv export --format requirements.txt -o requirements.txt && git add uv.lock requirements.txt'";
+      files = "^pyproject\\.toml$";
+      stages = [ "pre-commit" ];
+      pass_filenames = false;
+    };
   };
 
   # See full reference at https://devenv.sh/reference/options/
