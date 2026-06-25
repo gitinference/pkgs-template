@@ -1,3 +1,8 @@
+## [0.3.0] - 2026-06-25
+
+### 🚀 Features
+
+- *(.forgejo/workflows/publish.yaml)* Add CI & Publish workflow for uv using ForgeJo and uv CLI
 ## [0.2.1] - 2026-06-25
 
 ### 🚀 Features
