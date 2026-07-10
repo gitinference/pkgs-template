@@ -35,6 +35,8 @@ MANIFEST
 *.csv
 *.txt
 *.parquet
+*.zip
+*.xlsx
 
 # Exeption for requirements
 !requirements.txt

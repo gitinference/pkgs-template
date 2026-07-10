@@ -5,12 +5,12 @@
 
 set -e
 
-cd "$(dirname "$0")"
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 FORCE=false
 
 usage() {
-  echo "Usage: $0 [options] VERSION"
+  echo "Usage: release [options] VERSION"
   echo
   echo "VERSION:"
   echo "  major: bump major version number"
@@ -61,7 +61,7 @@ fi
 
 # Check if git-cliff is installed
 if ! command -v git-cliff &>/dev/null; then
-  echo "Error: git-cliff is not installed. Please install it first (e.g., 'uv tool install git-cliff' or 'brew install git-cliff')."
+  echo "Error: git-cliff is not installed. Please install it first."
   exit 1
 fi
 
