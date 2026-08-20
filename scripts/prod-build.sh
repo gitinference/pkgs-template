@@ -2,41 +2,30 @@
 set -euo pipefail
 
 # --- 1. Configurations ---
-IMAGE_NAME="ouslan/python-app"
-IMAGE_TAG="${GITHUB_SHA:-latest}"
-REGISTRY_IMAGE="docker.io/${IMAGE_NAME}"
+IMAGE_NAME="ouslan/fsdc-api"
+IMAGE_TAG="${GITHUB_SHA:-latest}" # Defaults to 'latest' if not in GitHub Actions
 
-echo "🚀 Starting Production Container Build Pipeline (via Docker/DinD)..."
+echo "🚀 Starting Production Container Build Pipeline..."
 
 # --- 2. Docker Hub Authentication ---
 if [ -z "${DOCKER_PASSWORD:-}" ] || [ -z "${DOCKER_USERNAME:-}" ]; then
-  echo "❌ Error: DOCKER_USERNAME or DOCKER_PASSWORD not set. Cannot push to registry."
-  exit 1
+  echo "⚠️ Warning: DOCKER_HUB_USERNAME or DOCKER_HUB_TOKEN not set. Skipping authentication. (Assuming already logged in)"
 else
   echo "🔐 Logging into Docker Hub..."
-  # Changed podman to docker ⬇️
-  echo "$DOCKER_PASSWORD" | docker login docker.io -u "$DOCKER_USERNAME" --password-stdin
+  echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 fi
 
-# --- 3. Build & Tag via Docker ---
-echo "📦 Building image as '${REGISTRY_IMAGE}:${IMAGE_TAG}'..."
-# Changed podman to docker ⬇️
-docker build -f ./Dockerfile -t "${REGISTRY_IMAGE}:${IMAGE_TAG}" .
+# --- 3. Build & Push via Docker ---
+echo "📦 Building Docker image..."
+# We pass python and uv versions down as build arguments if needed,
+# ensuring your Dockerfile precisely targets what Nix specified.
+docker build \
+  --build-arg UV_VERSION="latest" \
+  -t "${IMAGE_NAME}:${IMAGE_TAG}" \
+  -t "${IMAGE_NAME}:latest" .
 
-if [ "${IMAGE_TAG}" != "latest" ]; then
-  echo "🏷️ Tagging image as 'latest'..."
-  # Changed podman to docker ⬇️
-  docker tag "${REGISTRY_IMAGE}:${IMAGE_TAG}" "${REGISTRY_IMAGE}:latest"
-fi
-
-# --- 4. Push via Docker ---
 echo "📤 Pushing images to Docker Hub..."
-# Changed podman to docker ⬇️
-docker push "${REGISTRY_IMAGE}:${IMAGE_TAG}"
-
-if [ "${IMAGE_TAG}" != "latest" ]; then
-  # Changed podman to docker ⬇️
-  docker push "${REGISTRY_IMAGE}:latest"
-fi
+docker push "${IMAGE_NAME}:${IMAGE_TAG}"
+docker push "${IMAGE_NAME}:latest"
 
 echo "✅ Deployment completed successfully!"
