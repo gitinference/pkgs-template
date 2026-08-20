@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 13-container
 
 jobs:
   Build-And-Publish:
@@ -36,7 +35,22 @@ jobs:
         with:
           name: devenv
 
+      # 1. Cache the local Nix profile and root paths where devenv installs profiles
+      - name: Restore Nix Profile Cache
+        uses: actions/cache@v4
+        id: nix-cache
+        with:
+          path: |
+            ~/.nix-profile
+            ~/.nix-defexpr
+            ~/.local/state/nix
+          key: nix-profile-${{ hashFiles('**/devenv.nix', '**/devenv.yaml') }}
+          restore-keys: |
+            nix-profile-
+
       - name: Install devenv.sh
+        # Skip if we successfully restored a profile matching your devenv configuration
+        if: steps.nix-cache.outputs.cache-hit != 'true'
         run: nix profile add github:cachix/devenv/v2.1.2
 
       - name: Build and Deploy Container
