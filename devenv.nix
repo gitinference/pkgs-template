@@ -8,19 +8,9 @@
 {
   # --- 1. Global Base Configuration ---
   # Variables and settings that apply absolutely everywhere (Dev & Prod)
-  env = {
-    GREET = "devenv";
-  };
-
-  dotenv.enable = true;
-
   imports = [
     ./devenv # Loads ./devenv/default.nix
   ];
-
-  scripts.hello.exec = ''
-    echo hello from $GREET
-  '';
 
   # --- 2. Profile Definitions ---
   profiles = {
@@ -46,9 +36,12 @@
       ];
 
       enterShell = ''
-        hello
-        git --version
-        export OCO_API_CUSTOM_HEADERS="{\"Authorization\": \"Bearer $OLLAMA_API_KEY\"}"
+              if [ -f .env ]; then
+            set -a
+            source .env
+            set +a
+        fi
+              export OCO_API_CUSTOM_HEADERS="{\"Authorization\": \"Bearer $OLLAMA_API_KEY\"}"
       '';
 
       enterTest = ''
